@@ -11,6 +11,8 @@ const __dirname = path.dirname(__filename);
 //#endregion
 
 const SIZE = 5;// Size of grid, currently a 5x5 square
+const DEFAULT_MINES = 8;// Amount of default mines
+const DEFAULT_BET = 10;// Default value for bet
 const HOUSETAX = 0.01;// % the house takes, reducing probability of winning
 
 let gameInformation;
@@ -21,12 +23,12 @@ let playerBalance = 100;
 function initialize(){
     gameInformation = {
         gameGrid: null,
-        mineAmount: 0,
+        mineAmount: DEFAULT_MINES,
         gameState: 0
     }
     playerVolatileInformation = {
         playerProfitMultiplier: 1,
-        playerBet: 0,
+        playerBet: DEFAULT_BET,
         playerProfit: 0
     }
     successfulHits = 0;
@@ -126,6 +128,16 @@ app.post('/game/end',(req,res)=>{
     res.send({
         balance: playerBalance,
     });
+})
+
+app.post("/game/init",(req,res)=>{
+    initialize();
+    res.send({
+        mines: gameInformation.mineAmount,
+        bet: playerVolatileInformation.playerBet,
+        gameState: 0,
+        balance: playerBalance
+    })
 })
 
 app.listen(port,()=>{
