@@ -36,7 +36,7 @@ function initialize(){
 
 function randomCell(rowCount,columnCount){
     const row = Math.floor(Math.random()*rowCount);
-    const column = Math.floor(Math.random()*columnCount)
+    const column = Math.floor(Math.random()*columnCount);
     return {
         row: row,
         column: column,
@@ -86,6 +86,16 @@ app.get('/', (req,res)=>{
     res.sendFile(path.join(__dirname,"/dist/index.html"));// Sends the HTML built from React
 })
 
+app.get('/game/init',(req,res)=>{
+    initialize();
+    res.send({
+        mines: gameInformation.mineAmount,
+        bet: playerVolatileInformation.playerBet,
+        gameState: 0,
+        balance: playerBalance
+    })
+})
+
 app.get('/game/verify-cell',(req,res)=>{
     console.log(req.query);
     const cell = {// Information about row and column from clicked cell to be verified to be either safe or mined
@@ -130,15 +140,7 @@ app.post('/game/end',(req,res)=>{
     });
 })
 
-app.post("/game/init",(req,res)=>{
-    initialize();
-    res.send({
-        mines: gameInformation.mineAmount,
-        bet: playerVolatileInformation.playerBet,
-        gameState: 0,
-        balance: playerBalance
-    })
-})
+
 
 app.listen(port,()=>{
     console.log(`App is listening on port ${port}`);
