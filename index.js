@@ -131,7 +131,7 @@ app.post('/game/start', (req,res)=>{
 
 app.post('/game/end',(req,res)=>{
     if(gameInformation.gameState!=2){
-        playerBalance += playerVolatileInformation.playerProfit;
+        playerBalance += playerVolatileInformation.playerProfit + playerVolatileInformation.playerBet;
     }
     console.log(playerBalance);
     initialize();
