@@ -19,6 +19,7 @@ let gameInformation;
 let playerVolatileInformation;
 let successfulHits;
 let playerBalance = 100;
+let betApproval = false;
 
 function initialize(){
     gameInformation = {
@@ -116,16 +117,20 @@ app.get('/game/verify-cell',(req,res)=>{
 });
 
 app.post('/game/start', (req,res)=>{
-    console.log(req.body);
     initialize();
-    gameInformation.gameGrid = generateGrid(req.body.mines);// Client requests a grid of mines and safe cells to be built based on the amount of mines they desire
-    playerBalance -= req.body.bet;// Client requests a bet to be placed, which is deduced from their balance
-    playerVolatileInformation.playerBet = req.body.bet;// Client's bet request is stored in the backend to avoid client side manipulation
-    console.log(gameInformation.gameGrid);
-    gameInformation.gameState = 1; // Game state is 0 when there are no mines selected (initial state or restart)
+    betApproval = (playerBalance>=req.body.bet);// Verify if balance is larger than requested bet
+    if(betApproval){ // If there is enough balance
+        playerBalance -= req.body.bet;// Client requests a bet to be placed, which is deduced from their balance
+        playerVolatileInformation.playerBet = req.body.bet;// Client's bet request is stored in the backend to avoid client side manipulation
+        gameInformation.gameState = 1; // Game state is 0 when there are no mines selected (initial state or restart)
+        gameInformation.gameGrid = generateGrid(req.body.mines);// Client requests a grid of mines and safe cells to be built based on the amount of mines they desire
+    } else {
+        gameInformation.gameState = 0; // If there are no funds, stay at state 0
+    }
     res.send({
         gameState: gameInformation.gameState,// Host responds with the current game state, either a reset (0) or play(1)
-        balance: playerBalance// Host responds with the new balance
+        balance: playerBalance,// Host responds with the new balance
+        betApproval: betApproval// Returns to the client if their request was approved or not
     });
 });
 
